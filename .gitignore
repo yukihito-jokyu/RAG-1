@@ -8,3 +8,9 @@ wheels/
 
 # venv
 .venv
+
+# envファイル
+src/rag_1/.env
+
+# mypy
+.mypy_cache

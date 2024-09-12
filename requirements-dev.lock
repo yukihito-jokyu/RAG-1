@@ -14,6 +14,7 @@ aiohappyeyeballs==2.4.0
     # via aiohttp
 aiohttp==3.10.5
     # via langchain
+    # via langchain-community
 aiosignal==1.3.1
     # via aiohttp
 annotated-types==0.7.0
@@ -36,13 +37,22 @@ charset-normalizer==3.3.2
     # via requests
 colorama==0.4.6
     # via tqdm
+dataclasses-json==0.6.7
+    # via langchain-community
 distro==1.9.0
     # via openai
 exceptiongroup==1.2.2
     # via anyio
+filelock==3.16.0
+    # via huggingface-hub
+    # via torch
+    # via transformers
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
+fsspec==2024.9.0
+    # via huggingface-hub
+    # via torch
 google-ai-generativelanguage==0.6.6
     # via google-generativeai
 google-api-core==2.19.2
@@ -81,21 +91,33 @@ httplib2==0.22.0
 httpx==0.27.2
     # via langsmith
     # via openai
+huggingface-hub==0.24.6
+    # via sentence-transformers
+    # via tokenizers
+    # via transformers
 idna==3.8
     # via anyio
     # via httpx
     # via requests
     # via yarl
+jinja2==3.1.4
+    # via torch
 jiter==0.5.0
     # via openai
+joblib==1.4.2
+    # via scikit-learn
 jsonpatch==1.33
     # via langchain-core
 jsonpointer==3.0.0
     # via jsonpatch
 langchain==0.2.16
+    # via langchain-community
+    # via rag-1
+langchain-community==0.2.16
     # via rag-1
 langchain-core==0.2.39
     # via langchain
+    # via langchain-community
     # via langchain-google-genai
     # via langchain-text-splitters
 langchain-google-genai==1.0.10
@@ -104,18 +126,39 @@ langchain-text-splitters==0.2.4
     # via langchain
 langsmith==0.1.117
     # via langchain
+    # via langchain-community
     # via langchain-core
+markupsafe==2.1.5
+    # via jinja2
+marshmallow==3.22.0
+    # via dataclasses-json
+mpmath==1.3.0
+    # via sympy
 multidict==6.1.0
     # via aiohttp
     # via yarl
+mypy-extensions==1.0.0
+    # via typing-inspect
+networkx==3.3
+    # via torch
 numpy==1.26.4
     # via langchain
+    # via langchain-community
+    # via scikit-learn
+    # via scipy
+    # via sentence-transformers
+    # via transformers
 openai==1.44.1
     # via rag-1
 orjson==3.10.7
     # via langsmith
 packaging==24.1
+    # via huggingface-hub
     # via langchain-core
+    # via marshmallow
+    # via transformers
+pillow==10.4.0
+    # via sentence-transformers
 proto-plus==1.24.0
     # via google-ai-generativelanguage
     # via google-api-core
@@ -141,36 +184,75 @@ pydantic-core==2.23.3
     # via pydantic
 pyparsing==3.1.4
     # via httplib2
+python-dotenv==1.0.1
+    # via rag-1
 pyyaml==6.0.2
+    # via huggingface-hub
     # via langchain
+    # via langchain-community
     # via langchain-core
+    # via transformers
+regex==2024.9.11
+    # via transformers
 requests==2.32.3
     # via google-api-core
+    # via huggingface-hub
     # via langchain
+    # via langchain-community
     # via langsmith
+    # via transformers
 rsa==4.9
     # via google-auth
+safetensors==0.4.5
+    # via transformers
+scikit-learn==1.5.2
+    # via sentence-transformers
+scipy==1.14.1
+    # via scikit-learn
+    # via sentence-transformers
+sentence-transformers==3.1.0
+    # via rag-1
 sniffio==1.3.1
     # via anyio
     # via httpx
     # via openai
 sqlalchemy==2.0.34
     # via langchain
+    # via langchain-community
+sympy==1.13.2
+    # via torch
 tenacity==8.5.0
     # via langchain
+    # via langchain-community
     # via langchain-core
+threadpoolctl==3.5.0
+    # via scikit-learn
+tokenizers==0.19.1
+    # via transformers
+torch==2.4.1
+    # via sentence-transformers
 tqdm==4.66.5
     # via google-generativeai
+    # via huggingface-hub
     # via openai
+    # via sentence-transformers
+    # via transformers
+transformers==4.44.2
+    # via sentence-transformers
 typing-extensions==4.12.2
     # via anyio
     # via google-generativeai
+    # via huggingface-hub
     # via langchain-core
     # via multidict
     # via openai
     # via pydantic
     # via pydantic-core
     # via sqlalchemy
+    # via torch
+    # via typing-inspect
+typing-inspect==0.9.0
+    # via dataclasses-json
 uritemplate==4.1.1
     # via google-api-python-client
 urllib3==2.2.2
