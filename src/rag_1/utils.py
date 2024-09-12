@@ -2,6 +2,8 @@ from typing import List
 
 import numpy as np
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
@@ -50,15 +52,42 @@ def init_embedding_model() -> HuggingFaceEmbeddings:
     return hf
 
 
+def make_documents(text_list: List[str]) -> Document:
+    """
+    説明
+    ----------
+    textを分割し、Documentとして返す。
+
+    Parameter
+    ----------
+    text_list : List[str]
+        リスト型の文章
+
+    Returns
+    ----------
+    langchain_core.documents.Document
+        Document型のデータ
+
+    """
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=200,
+        chunk_overlap=0,
+    )
+
+    doc_list = text_splitter.create_documents(text_list)
+
+    return doc_list
+
+
 if __name__ == "__main__":
-    text1 = "私は人間かもしれない。"
-    text2 = "亀は海に生息している。"
+    with open("dataset/novels/1.txt", "r") as file:
+        document = file.read()
 
-    embedding_model = init_embedding_model()
+    doc_list = make_documents([document])
 
-    vec1 = embedding_model.embed_query(text=text1)
-    vec2 = embedding_model.embed_query(text=text2)
-
-    similarity = cosine_similarity(vec1=vec1, vec2=vec2)
-
-    print(similarity)
+    print(doc_list)
+    for doc in doc_list:
+        print(len(doc.page_content))
+        print(doc)
+    print(len(doc_list))
