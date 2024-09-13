@@ -2,9 +2,10 @@ import json
 from typing import List
 
 import numpy as np
-from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from tqdm import tqdm
 
 JSON_PATH = "src/rag_1/config/config.json"
 with open(JSON_PATH, "r", encoding="utf-8") as file:
@@ -103,14 +104,36 @@ def make_documents(text_list: List[str]) -> Document:
     return doc_list
 
 
-if __name__ == "__main__":
-    with open("dataset/novels/1.txt", "r") as file:
-        document = file.read()
+def get_text() -> List[str]:
+    """
+    説明
+    ----------
+    datasetから文章を取得し、リストとして返す。
 
-    doc_list = make_documents([document])
+    Returns
+    ----------
+    List[str]
+        各txtファイルから取り出した文章をリストとして保管したもの
+
+    """
+
+    doc_list = []
+
+    for i in range(1, 8):
+        with open(f"dataset/novels/{i}.txt", "r") as file:
+            document = file.read()
+        doc_list.append(document)
+
+    return doc_list
+
+
+if __name__ == "__main__":
+    documents = get_text()
+
+    doc_list = make_documents(documents)
 
     print(doc_list)
     for doc in doc_list:
         print(len(doc.page_content))
-        print(doc)
+        # print(doc)
     print(len(doc_list))
