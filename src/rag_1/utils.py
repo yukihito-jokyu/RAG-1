@@ -1,9 +1,14 @@
+import json
 from typing import List
 
 import numpy as np
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+JSON_PATH = "src/rag_1/config/config.json"
+with open(JSON_PATH, "r", encoding="utf-8") as file:
+    CONFIG = json.load(file)
 
 
 def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
@@ -46,7 +51,10 @@ def init_embedding_model() -> HuggingFaceEmbeddings:
 
     """
 
-    model_name = "intfloat/multilingual-e5-large"
+    # ハイパーパラメータの取得
+    config = CONFIG["HuggingFaceEmbeddings"]
+    model_name = config["model_name"]  # 使用するモデル名
+
     hf = HuggingFaceEmbeddings(model_name=model_name)
 
     return hf
@@ -70,9 +78,24 @@ def make_documents(text_list: List[str]) -> Document:
 
     """
 
+    # ハイパーパラメータの取得
+    config = CONFIG["RecursiveCharacterTextSplitter"]
+    chunk_size = config["chunk_size"]  # 1チャンクに含める最大文字数
+    chunk_overlap = config["chunk_overlap"]  # 隣接するチャンク間で重複する文字数
+    keep_separator = config["keep_separator"]  # 分割に使用したセパレータをチャンクに保持するか
+    add_start_index = config[
+        "add_start_index"
+    ]  # 各チャンクのメタデータにそのチャンクが元のテキストデータのどこから始めるかを含めるかどうか
+    strip_whitespace = config["strip_whitespace"]  # 各チャンクの銭湯や末尾にある不要な空白文字を削除するかどうか
+    separators = config["separators"]  # チャンクに分ける際に使用する文字
+
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=200,
-        chunk_overlap=0,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        keep_separator=keep_separator,
+        add_start_index=add_start_index,
+        strip_whitespace=strip_whitespace,
+        separators=separators,
     )
 
     doc_list = text_splitter.create_documents(text_list)
