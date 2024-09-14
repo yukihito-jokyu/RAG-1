@@ -19,6 +19,9 @@ class NormalSearch:
     self.documents : Document
         ドキュメント
 
+    self.path : str
+        ベクトルストアを保存してるpath
+
     method
     ----------
     search(self, query: str, tops: int) -> List[Document]
@@ -32,18 +35,24 @@ class NormalSearch:
         外部の関数を使用している
     """
 
-    def __init__(self) -> None:
+    def __init__(self, path: str) -> None:
         """
         説明
         ----------
         関連するドキュメントを検索するクラス
+
+        Parameters
+        ----------
+        path : str
+            ベクトルストアを保存しているディレクトリまでのpath
         """
 
         self._setup()
+        self.path = path
         self.vectorstore = Chroma.from_documents(
             documents=self.documents,
             embedding=self.embedding,
-            persist_directory="vectorestore",
+            persist_directory=self.path,
         )
 
     def _setup(self) -> None:
@@ -81,7 +90,7 @@ class NormalSearch:
         return results
 
     @classmethod
-    def load(cls):
+    def load(cls, path: str):
         """
         説明
         ----------
@@ -94,6 +103,9 @@ class NormalSearch:
             このメソッドが呼び出されるクラス（NormalSearchまたはそのサブクラス）の型。
             クラスメソッドの第一引数として自動的に渡されます。
 
+        path : str
+            ベクトルストアを保存しているディレクトリまでのpath
+
         Returns
         ----------
         NormalSearch
@@ -103,7 +115,7 @@ class NormalSearch:
         instance = cls.__new__(cls)
         instance.embedding = init_embedding_model()
         instance.vectorstore = Chroma(
-            persist_directory="vectorestore", embedding_function=instance.embedding
+            persist_directory=path, embedding_function=instance.embedding
         )
 
         return instance

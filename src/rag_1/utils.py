@@ -119,6 +119,10 @@ def get_text() -> List[str]:
 
     doc_list = []
 
+    # with open("dataset/validation/novel.txt", "r", encoding="utf-8") as file:
+    #     document = file.read()
+    # doc_list.append(document)
+
     for i in range(1, 8):
         with open(f"dataset/novels/{i}.txt", "r") as file:
             document = file.read()

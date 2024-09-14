@@ -70,6 +70,8 @@ distro==1.9.0
     # via openai
 exceptiongroup==1.2.2
     # via anyio
+faiss-cpu==1.8.0.post1
+    # via rag-1
 fastapi==0.114.1
     # via chromadb
     # via langchain-chroma
@@ -207,6 +209,7 @@ networkx==3.3
 numpy==1.26.4
     # via chroma-hnswlib
     # via chromadb
+    # via faiss-cpu
     # via langchain
     # via langchain-chroma
     # via langchain-community
@@ -261,6 +264,7 @@ overrides==7.7.0
     # via chromadb
 packaging==24.1
     # via build
+    # via faiss-cpu
     # via huggingface-hub
     # via langchain-core
     # via marshmallow
