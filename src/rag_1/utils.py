@@ -61,7 +61,7 @@ def init_embedding_model() -> HuggingFaceEmbeddings:
     return hf
 
 
-def make_documents(text_list: List[str]) -> Document:
+def make_documents(text_list: List[str]) -> List[Document]:
     """
     説明
     ----------
@@ -104,11 +104,16 @@ def make_documents(text_list: List[str]) -> Document:
     return doc_list
 
 
-def get_text() -> List[str]:
+def get_text(mode: str) -> List[str]:
     """
     説明
     ----------
     datasetから文章を取得し、リストとして返す。
+
+    Parameter
+    ----------
+    mode : str
+        検証用かテスト用か区別するためのもの
 
     Returns
     ----------
@@ -119,20 +124,21 @@ def get_text() -> List[str]:
 
     doc_list = []
 
-    # with open("dataset/validation/novel.txt", "r", encoding="utf-8") as file:
-    #     document = file.read()
-    # doc_list.append(document)
-
-    for i in range(1, 8):
-        with open(f"dataset/novels/{i}.txt", "r") as file:
+    if mode == "valid":
+        with open("dataset/validation/novel.txt", "r", encoding="utf-8") as file:
             document = file.read()
         doc_list.append(document)
+    elif mode == "test":
+        for i in range(1, 8):
+            with open(f"dataset/novels/{i}.txt", "r") as file:
+                document = file.read()
+            doc_list.append(document)
 
     return doc_list
 
 
 if __name__ == "__main__":
-    documents = get_text()
+    documents = get_text(mode="valid")
 
     doc_list = make_documents(documents)
 

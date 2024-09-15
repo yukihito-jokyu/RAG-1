@@ -1,11 +1,10 @@
 from rag_1.generation import GoogleGemini
 from rag_1.search import NormalSearch
 
-# search = NormalSearch()
+search = NormalSearch()
 
-path = "valid_vectorestore"
 
-search = NormalSearch.load(path=path)
+# search = NormalSearch.load()
 
 # gemini = GoogleGemini()
 
