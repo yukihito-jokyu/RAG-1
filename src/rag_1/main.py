@@ -1,10 +1,10 @@
 from rag_1.generation import GoogleGemini
 from rag_1.search import NormalSearch
 
-search = NormalSearch()
+# search = NormalSearch()
+# search.save()
 
-
-# search = NormalSearch.load()
+search = NormalSearch.load()
 
 # gemini = GoogleGemini()
 
