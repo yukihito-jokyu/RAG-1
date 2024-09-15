@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from langchain_chroma import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
 from rag_1.utils import get_text, init_embedding_model, make_documents
@@ -52,19 +53,18 @@ class NormalSearch:
         """
 
         if mode == "valid":
-            path = f"vectorstore/{mode}"
+            self.path = f"vectorstore/{mode}"
         elif mode == "test":
-            path = f"vectorstore/{mode}"
+            self.path = f"vectorstore/{mode}"
         else:
-            path = "vectorstore/valid"
+            self.path = "vectorstore/valid"
 
         self.mode = mode
         self._setup()
         logging.info("ベクトルストアの作成開始！")
-        self.vectorstor = Chroma.from_documents(
+        self.vectorstore = FAISS.from_documents(
             documents=self.documents,
             embedding=self.embedding,
-            persist_directory=path,
         )
         logging.info("ベクトルストアの作成完了！")
 
@@ -100,10 +100,19 @@ class NormalSearch:
         """
 
         logging.info("検索中...")
-        results = self.vectorstor.similarity_search(query=query, k=tops)
+        results = self.vectorstore.similarity_search(query=query, k=tops)
         logging.info("検索完了！")
 
         return results
+
+    def save(self) -> None:
+        """
+        説明
+        ----------
+        ベクトルストアの保存を行うメソッド
+        """
+
+        self.vectorstore.save_local(folder_path=self.path)
 
     @classmethod
     def load(cls, mode: str = "valid"):
@@ -137,8 +146,10 @@ class NormalSearch:
 
         instance = cls.__new__(cls)
         instance.embedding = init_embedding_model()
-        instance.vectorstor = Chroma(
-            persist_directory=path, embedding_function=instance.embedding
+        instance.vectorstore = FAISS.load_local(
+            folder_path=path,
+            embeddings=instance.embedding,
+            allow_dangerous_deserialization=True,
         )
 
         return instance
