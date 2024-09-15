@@ -19,5 +19,4 @@ src/rag_1/.env
 dataset
 
 # vectorestore
-vectorestore
-valid_vectorestore
+vectorstore

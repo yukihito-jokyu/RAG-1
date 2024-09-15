@@ -3,10 +3,10 @@
         "model_name": "intfloat/multilingual-e5-large"
     },
     "RecursiveCharacterTextSplitter": {
-        "chunk_size": 200,
-        "chunk_overlap": 0,
+        "chunk_size": 400,
+        "chunk_overlap": 100,
         "keep_separator": false,
-        "add_start_index": false,
+        "add_start_index": true,
         "strip_whitespace": true,
         "separators": null
     }

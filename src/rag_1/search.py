@@ -1,9 +1,13 @@
-from typing import List, Type, TypeVar
+import logging
+from typing import List
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
 from rag_1.utils import get_text, init_embedding_model, make_documents
+
+# ログの基本設定
+logging.basicConfig(level=logging.INFO)
 
 
 class NormalSearch:
@@ -19,8 +23,8 @@ class NormalSearch:
     self.documents : Document
         ドキュメント
 
-    self.path : str
-        ベクトルストアを保存してるpath
+    self.mode : str
+        検証用かテスト用か区別するためのもの
 
     method
     ----------
@@ -35,7 +39,7 @@ class NormalSearch:
         外部の関数を使用している
     """
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, mode: str = "valid") -> None:
         """
         説明
         ----------
@@ -43,17 +47,26 @@ class NormalSearch:
 
         Parameters
         ----------
-        path : str
-            ベクトルストアを保存しているディレクトリまでのpath
+        mode : str = "valid"
+            検証用かテスト用か区別するためのもの
         """
 
+        if mode == "valid":
+            path = f"vectorstore/{mode}"
+        elif mode == "test":
+            path = f"vectorstore/{mode}"
+        else:
+            path = "vectorstore/valid"
+
+        self.mode = mode
         self._setup()
-        self.path = path
-        self.vectorstore = Chroma.from_documents(
+        logging.info("ベクトルストアの作成開始！")
+        self.vectorstor = Chroma.from_documents(
             documents=self.documents,
             embedding=self.embedding,
-            persist_directory=self.path,
+            persist_directory=path,
         )
+        logging.info("ベクトルストアの作成完了！")
 
     def _setup(self) -> None:
         """
@@ -62,7 +75,7 @@ class NormalSearch:
         他のpyファイルで定義した関数を使ってセットアップを行うメソッド
         """
 
-        text_list = get_text()
+        text_list = get_text(mode=self.mode)
 
         self.embedding = init_embedding_model()
         self.documents = make_documents(text_list=text_list)
@@ -86,11 +99,14 @@ class NormalSearch:
             関連するドキュメントをリストとして返す
         """
 
-        results = self.vectorstore.similarity_search(query=query, k=tops)
+        logging.info("検索中...")
+        results = self.vectorstor.similarity_search(query=query, k=tops)
+        logging.info("検索完了！")
+
         return results
 
     @classmethod
-    def load(cls, path: str):
+    def load(cls, mode: str = "valid"):
         """
         説明
         ----------
@@ -112,9 +128,16 @@ class NormalSearch:
             NNormalSearchクラス（またはそのサブクラス）のインスタンス
         """
 
+        if mode == "valid":
+            path = f"vectorstore/{mode}"
+        elif mode == "test":
+            path = f"vectorstore/{mode}"
+        else:
+            path = "vectorstore/valid"
+
         instance = cls.__new__(cls)
         instance.embedding = init_embedding_model()
-        instance.vectorstore = Chroma(
+        instance.vectorstor = Chroma(
             persist_directory=path, embedding_function=instance.embedding
         )
 
