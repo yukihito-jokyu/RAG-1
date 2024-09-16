@@ -1,7 +1,10 @@
 import json
+import os
+from pathlib import Path
 from typing import List
 
 import numpy as np
+import pandas as pd
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -101,6 +104,8 @@ def make_documents(text_list: List[str]) -> List[Document]:
 
     doc_list = text_splitter.create_documents(text_list)
 
+    make_scv_xlsx(documents=doc_list)
+
     return doc_list
 
 
@@ -135,6 +140,45 @@ def get_text(mode: str) -> List[str]:
             doc_list.append(document)
 
     return doc_list
+
+
+def make_scv_xlsx(documents: List[Document]) -> None:
+    """
+    説明
+    ----------
+    documentsからcsvとxlsxファイルを作成する
+
+    Parameter
+    ----------
+    documents : List[Document]
+        チャンク分割したドキュメント
+
+    """
+
+    sentence_length_list = []
+    doc_list = []
+    id_list = []
+
+    id = 0
+
+    for doc in documents:
+        d = doc.page_content
+        doc_list.append(d)
+        sentence_length_list.append(len(d))
+        id_list.append(id)
+
+        id += 1
+
+    data = {"chunk_id": id_list, "document": doc_list, "length": sentence_length_list}
+
+    df = pd.DataFrame(data)
+
+    folder_path = "dataset/chunk"
+
+    Path(folder_path).mkdir(parents=True, exist_ok=True)
+
+    df.to_csv(os.path.join(folder_path, "chunk.csv"), index=False)
+    df.to_excel(os.path.join(folder_path, "chunk.xlsx"), index=False)
 
 
 if __name__ == "__main__":

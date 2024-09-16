@@ -90,6 +90,6 @@ class GoogleGemini:
         documents_list = [doc.page_content for doc in documents]
         documents_text = "\n".join(documents_list)
 
-        prompt = f"以下の情報を基に質問に回答して下さい。： \n\n{documents_text}\n\n質問： {query}"
+        prompt = f"以下の情報を基に質問に端的に予測回答して下さい。もし予測できない場合は「分かりません」と答えて下さい。： \n\n{documents_text}\n\n質問： {query}"
 
         return prompt
