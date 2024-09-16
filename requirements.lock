@@ -68,6 +68,8 @@ deprecated==1.2.14
     # via opentelemetry-semantic-conventions
 distro==1.9.0
     # via openai
+et-xmlfile==1.1.0
+    # via openpyxl
 exceptiongroup==1.2.2
     # via anyio
 faiss-cpu==1.8.0.post1
@@ -214,6 +216,7 @@ numpy==1.26.4
     # via langchain-chroma
     # via langchain-community
     # via onnxruntime
+    # via pandas
     # via scikit-learn
     # via scipy
     # via sentence-transformers
@@ -224,6 +227,8 @@ oauthlib==3.2.2
 onnxruntime==1.19.2
     # via chromadb
 openai==1.44.1
+    # via rag-1
+openpyxl==3.1.5
     # via rag-1
 opentelemetry-api==1.27.0
     # via chromadb
@@ -270,6 +275,8 @@ packaging==24.1
     # via marshmallow
     # via onnxruntime
     # via transformers
+pandas==2.2.2
+    # via rag-1
 pillow==10.4.0
     # via sentence-transformers
 posthog==3.6.5
@@ -313,10 +320,13 @@ pyreadline3==3.4.3
     # via humanfriendly
 python-dateutil==2.9.0.post0
     # via kubernetes
+    # via pandas
     # via posthog
 python-dotenv==1.0.1
     # via rag-1
     # via uvicorn
+pytz==2024.2
+    # via pandas
 pyyaml==6.0.2
     # via chromadb
     # via huggingface-hub
@@ -422,6 +432,8 @@ typing-extensions==4.12.2
     # via uvicorn
 typing-inspect==0.9.0
     # via dataclasses-json
+tzdata==2024.1
+    # via pandas
 uritemplate==4.1.1
     # via google-api-python-client
 urllib3==2.2.2
