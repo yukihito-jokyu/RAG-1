@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from pathlib import Path
 from typing import List
 
@@ -104,7 +105,7 @@ def make_documents(text_list: List[str]) -> List[Document]:
 
     doc_list = text_splitter.create_documents(text_list)
 
-    make_scv_xlsx(documents=doc_list)
+    make_csv_xlsx(documents=doc_list)
 
     return doc_list
 
@@ -132,17 +133,21 @@ def get_text(mode: str) -> List[str]:
     if mode == "valid":
         with open("dataset/validation/novel.txt", "r", encoding="utf-8") as file:
             document = file.read()
+        document = re.sub(r"-{55}.*?-{55}", "", document, flags=re.DOTALL)
+        document = re.sub(r"\［.*?\］", "", document)
+        document = document.replace("\n", "").replace("\u3000", "").replace(" ", "")
         doc_list.append(document)
     elif mode == "test":
         for i in range(1, 8):
             with open(f"dataset/novels/{i}.txt", "r") as file:
                 document = file.read()
+            document = document.replace("\n", "").replace("\u3000", "")
             doc_list.append(document)
 
     return doc_list
 
 
-def make_scv_xlsx(documents: List[Document]) -> None:
+def make_csv_xlsx(documents: List[Document]) -> None:
     """
     説明
     ----------
@@ -156,6 +161,7 @@ def make_scv_xlsx(documents: List[Document]) -> None:
     """
 
     sentence_length_list = []
+    start_index_list = []
     doc_list = []
     id_list = []
 
@@ -163,13 +169,21 @@ def make_scv_xlsx(documents: List[Document]) -> None:
 
     for doc in documents:
         d = doc.page_content
+        start_index = doc.metadata["start_index"]
+
         doc_list.append(d)
+        start_index_list.append(start_index)
         sentence_length_list.append(len(d))
         id_list.append(id)
 
         id += 1
 
-    data = {"chunk_id": id_list, "document": doc_list, "length": sentence_length_list}
+    data = {
+        "chunk_id": id_list,
+        "document": doc_list,
+        "start_index": start_index_list,
+        "length": sentence_length_list,
+    }
 
     df = pd.DataFrame(data)
 
@@ -182,12 +196,16 @@ def make_scv_xlsx(documents: List[Document]) -> None:
 
 
 if __name__ == "__main__":
-    documents = get_text(mode="valid")
+    # documents = get_text(mode="valid")
 
-    doc_list = make_documents(documents)
+    # doc_list = make_documents(documents)
 
-    print(doc_list)
-    for doc in doc_list:
-        print(len(doc.page_content))
-        # print(doc)
-    print(len(doc_list))
+    # print(doc_list)
+    # for doc in doc_list:
+    #     print(len(doc.page_content))
+    #     # print(doc)
+    # print(len(doc_list))
+
+    # 元の文字列
+    text = "でも自分のよくなりつつあるという暗示を得たいという二つの事柄なのであった。"
+    print(len(text))
