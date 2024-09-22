@@ -2,7 +2,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -65,7 +65,9 @@ def init_embedding_model() -> HuggingFaceEmbeddings:
     return hf
 
 
-def make_documents(text_list: List[str]) -> List[Document]:
+def make_documents(
+    text_list: List[str], first_line_list: List[str], mode: str = "valid"
+) -> List[Document]:
     """
     説明
     ----------
@@ -103,14 +105,19 @@ def make_documents(text_list: List[str]) -> List[Document]:
         separators=separators,
     )
 
-    doc_list = text_splitter.create_documents(text_list)
+    documents_list = []
 
-    make_csv_xlsx(documents=doc_list)
+    for text, first_line in zip(text_list, first_line_list):
+        metadata = {"title": first_line}
+        doc_list = text_splitter.create_documents([text], [metadata])
+        documents_list.extend(doc_list)
 
-    return doc_list
+    make_csv_xlsx(documents=documents_list, mode=mode)
+
+    return documents_list
 
 
-def get_text(mode: str) -> List[str]:
+def get_text(mode: str) -> Tuple[List[str], List[str]]:
     """
     説明
     ----------
@@ -129,25 +136,32 @@ def get_text(mode: str) -> List[str]:
     """
 
     doc_list = []
+    first_line_list = []
 
     if mode == "valid":
         with open("dataset/validation/novel.txt", "r", encoding="utf-8") as file:
             document = file.read()
+        first_line = document.splitlines()[0]
         document = re.sub(r"-{55}.*?-{55}", "", document, flags=re.DOTALL)
         document = re.sub(r"\［.*?\］", "", document)
         document = document.replace("\n", "").replace("\u3000", "").replace(" ", "")
         doc_list.append(document)
+        first_line_list.append(first_line)
     elif mode == "test":
         for i in range(1, 8):
             with open(f"dataset/novels/{i}.txt", "r") as file:
                 document = file.read()
-            document = document.replace("\n", "").replace("\u3000", "")
+            first_line = document.splitlines()[0]
+            document = re.sub(r"-{55}.*?-{55}", "", document, flags=re.DOTALL)
+            document = re.sub(r"\［.*?\］", "", document)
+            document = document.replace("\n", "").replace("\u3000", "").replace(" ", "")
             doc_list.append(document)
+            first_line_list.append(first_line)
 
-    return doc_list
+    return doc_list, first_line_list
 
 
-def make_csv_xlsx(documents: List[Document]) -> None:
+def make_csv_xlsx(documents: List[Document], mode: str = "valid") -> None:
     """
     説明
     ----------
@@ -162,6 +176,7 @@ def make_csv_xlsx(documents: List[Document]) -> None:
 
     sentence_length_list = []
     start_index_list = []
+    title_list = []
     doc_list = []
     id_list = []
 
@@ -170,9 +185,11 @@ def make_csv_xlsx(documents: List[Document]) -> None:
     for doc in documents:
         d = doc.page_content
         start_index = doc.metadata["start_index"]
+        title = doc.metadata["title"]
 
         doc_list.append(d)
         start_index_list.append(start_index)
+        title_list.append(title)
         sentence_length_list.append(len(d))
         id_list.append(id)
 
@@ -180,6 +197,7 @@ def make_csv_xlsx(documents: List[Document]) -> None:
 
     data = {
         "chunk_id": id_list,
+        "title": title_list,
         "document": doc_list,
         "start_index": start_index_list,
         "length": sentence_length_list,
@@ -187,7 +205,10 @@ def make_csv_xlsx(documents: List[Document]) -> None:
 
     df = pd.DataFrame(data)
 
-    folder_path = "dataset/chunk"
+    if mode == "valid":
+        folder_path = "dataset/chunk/valid"
+    elif mode == "test":
+        folder_path = "dataset/chunk/test"
 
     Path(folder_path).mkdir(parents=True, exist_ok=True)
 
@@ -207,5 +228,7 @@ if __name__ == "__main__":
     # print(len(doc_list))
 
     # 元の文字列
-    text = "でも自分のよくなりつつあるという暗示を得たいという二つの事柄なのであった。"
-    print(len(text))
+    # text = "でも自分のよくなりつつあるという暗示を得たいという二つの事柄なのであった。"
+    # print(len(text))
+    df = pd.read_csv("dataset/query.csv")
+    df.to_excel("dataset/query.xlsx", index=False)
