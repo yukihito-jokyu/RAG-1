@@ -7,6 +7,7 @@ from langchain_core.documents import Document
 from pandas import DataFrame
 
 from rag_1.search import NormalSearch
+from rag_1.utils import CONFIG
 
 
 class Validation:
@@ -37,14 +38,15 @@ class Validation:
         各クエリに対して、検索ランキングを作成し、xlsx,csvファイルで保存する
     """
 
-    def __init__(self) -> None:
+    def __init__(self, mode: str = "valid") -> None:
         """
         説明
         ----------
         各クエリに対して検索の検証を行うクラス
         """
 
-        self.search = NormalSearch.load()
+        self.mode = mode
+        self.search = NormalSearch.load(mode=mode)
         self.df = self._load_df()
 
     def _load_df(self) -> DataFrame:
@@ -59,7 +61,11 @@ class Validation:
             データフレーム
         """
 
-        df = pd.read_excel("dataset/validation/ans_txt.xlsx")
+        if self.mode == "valid":
+            df = pd.read_excel("dataset/validation/ans_txt.xlsx")
+        elif self.mode == "test":
+            df = pd.read_excel("dataset/query.xlsx")
+
         return df
 
     def _exist(
@@ -263,7 +269,65 @@ class Validation:
 
         df_result = pd.concat([df1, df2], axis=1)
 
-        folder_path = "dataset/result"
+        chunk_size = CONFIG["RecursiveCharacterTextSplitter"]["chunk_size"]
+        chunk_overlap = CONFIG["RecursiveCharacterTextSplitter"]["chunk_overlap"]
+
+        folder_path = (
+            f"dataset/result/chunk_size{chunk_size}chunk_overlap{chunk_overlap}"
+        )
+
+        Path(folder_path).mkdir(parents=True, exist_ok=True)
+
+        df_result.to_csv(os.path.join(folder_path, "result.csv"), index=False)
+        df_result.to_excel(os.path.join(folder_path, "result.xlsx"), index=False)
+
+    def valid_test(self) -> None:
+        """
+        説明
+        ----------
+        検索の検証(test)を行うメソッド
+        """
+
+        result_list = []
+        title_list = []
+        query_list = []
+
+        columns = [
+            "1st",
+            "2nd",
+            "3rd",
+            "4th",
+            "5th",
+            "6th",
+            "7th",
+            "8th",
+            "9th",
+            "10th",
+        ]
+
+        for row in self.df.itertuples():
+            query = row.problem
+            title = row.name
+
+            results = self.search.search(query=query, tops=10)
+            result_list.append(results)
+
+            query_list.append(query)
+            title_list.append(title)
+
+        df1_data = {"query": query_list, "title": title_list}
+
+        df1 = pd.DataFrame(df1_data)
+        df2 = pd.DataFrame(result_list, columns=columns)
+
+        df_result = pd.concat([df1, df2], axis=1)
+
+        chunk_size = CONFIG["RecursiveCharacterTextSplitter"]["chunk_size"]
+        chunk_overlap = CONFIG["RecursiveCharacterTextSplitter"]["chunk_overlap"]
+
+        folder_path = (
+            f"dataset/result/test/chunk_size{chunk_size}chunk_overlap{chunk_overlap}"
+        )
 
         Path(folder_path).mkdir(parents=True, exist_ok=True)
 
@@ -272,5 +336,5 @@ class Validation:
 
 
 if __name__ == "__main__":
-    valid = Validation()
-    valid.valid()
+    valid = Validation(mode="test")
+    valid.valid_test()

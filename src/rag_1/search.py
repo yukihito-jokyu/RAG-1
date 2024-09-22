@@ -5,7 +5,7 @@ from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
-from rag_1.utils import get_text, init_embedding_model, make_documents
+from rag_1.utils import CONFIG, get_text, init_embedding_model, make_documents
 
 # ログの基本設定
 logging.basicConfig(level=logging.INFO)
@@ -52,10 +52,15 @@ class NormalSearch:
             検証用かテスト用か区別するためのもの
         """
 
+        chunk_size = CONFIG["RecursiveCharacterTextSplitter"]["chunk_size"]
+        chunk_overlap = CONFIG["RecursiveCharacterTextSplitter"]["chunk_overlap"]
+
         if mode == "valid":
             self.path = f"vectorstore/{mode}"
         elif mode == "test":
-            self.path = f"vectorstore/{mode}"
+            self.path = (
+                f"vectorstore/{mode}/chunk_size{chunk_size}chunk_overlap{chunk_overlap}"
+            )
         else:
             self.path = "vectorstore/valid"
 
@@ -75,10 +80,12 @@ class NormalSearch:
         他のpyファイルで定義した関数を使ってセットアップを行うメソッド
         """
 
-        text_list = get_text(mode=self.mode)
+        text_list, first_line_list = get_text(mode=self.mode)
 
         self.embedding = init_embedding_model()
-        self.documents = make_documents(text_list=text_list)
+        self.documents = make_documents(
+            text_list=text_list, first_line_list=first_line_list, mode=self.mode
+        )
 
     def search(self, query: str, tops: int) -> List[Document]:
         """
@@ -137,10 +144,15 @@ class NormalSearch:
             NNormalSearchクラス（またはそのサブクラス）のインスタンス
         """
 
+        chunk_size = CONFIG["RecursiveCharacterTextSplitter"]["chunk_size"]
+        chunk_overlap = CONFIG["RecursiveCharacterTextSplitter"]["chunk_overlap"]
+
         if mode == "valid":
             path = f"vectorstore/{mode}"
         elif mode == "test":
-            path = f"vectorstore/{mode}"
+            path = (
+                f"vectorstore/{mode}/chunk_size{chunk_size}chunk_overlap{chunk_overlap}"
+            )
         else:
             path = "vectorstore/valid"
 
